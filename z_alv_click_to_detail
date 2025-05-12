@@ -1,0 +1,75 @@
+REPORT z_alv_click_to_detail.
+
+CLASS lcl_alv_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      display_main_alv, " Método para mostrar el ALV principal
+      handle_user_action. " Método para manejar clics en el ALV
+  PRIVATE SECTION.
+    DATA:
+      it_header TYPE TABLE OF zfactura,   " Tabla para facturas (cabecera)
+      it_item   TYPE TABLE OF zfactura_det, " Tabla para detalles de factura
+      lo_alv    TYPE REF TO cl_salv_table. " Objeto ALV principal
+ENDCLASS.
+
+CLASS lcl_alv_demo IMPLEMENTATION.
+  METHOD display_main_alv.
+    " Obtener datos de la tabla de facturas (cabecera)
+    SELECT * FROM zfactura INTO TABLE it_header UP TO 50 ROWS.
+
+    " Crear el objeto ALV
+    TRY.
+        cl_salv_table=>factory(
+          IMPORTING
+            r_salv_table = lo_alv
+          CHANGING
+            t_table      = it_header ).
+      CATCH cx_salv_msg INTO DATA(lx_salv_error).
+        MESSAGE lx_salv_error->get_text( ) TYPE 'E'.
+    ENDTRY.
+
+    " Configurar eventos ALV
+    DATA(lo_events) = lo_alv->get_event( ).
+    SET HANDLER handle_user_action FOR lo_events->double_click.
+
+    " Mostrar el ALV principal
+    lo_alv->display( ).
+  ENDMETHOD.
+
+  METHOD handle_user_action.
+    " Obtener la fila seleccionada
+    DATA lt_selected_rows TYPE salv_t_row.
+    lo_alv->get_selections( )->get_selected_rows( IMPORTING et_row = lt_selected_rows ).
+
+    " Verificar si hay una selección
+    IF lt_selected_rows IS INITIAL.
+      MESSAGE 'Seleccione una fila para ver detalles.' TYPE 'I'.
+      RETURN.
+    ENDIF.
+
+    " Obtener el ID de la factura seleccionada
+    DATA(lv_factura_id) = it_header[ lt_selected_rows[ 1 ]-row_id ]-id_factura.
+
+    " Obtener detalles de la factura seleccionada
+    SELECT * FROM zfactura_det INTO TABLE it_item WHERE id_factura = lv_factura_id.
+
+    " Mostrar un nuevo ALV con los detalles
+    DATA(lo_alv_detail) TYPE REF TO cl_salv_table.
+    TRY.
+        cl_salv_table=>factory(
+          IMPORTING
+            r_salv_table = lo_alv_detail
+          CHANGING
+            t_table      = it_item ).
+      CATCH cx_salv_msg INTO lx_salv_error.
+        MESSAGE lx_salv_error->get_text( ) TYPE 'E'.
+    ENDTRY.
+
+    lo_alv_detail->display( ).
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+  " Crear instancia de la clase y ejecutar el método para mostrar el ALV principal
+  DATA(lo_alv_demo) = NEW lcl_alv_demo( ).
+  lo_alv_demo->display_main_alv( ).
