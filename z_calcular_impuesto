@@ -1,0 +1,30 @@
+FUNCTION z_calcular_impuesto.
+*-------------------------------------------------------------
+* Descripción: Calcula el impuesto sobre un monto dado.
+* Parámetros de entrada:
+*   - IV_MONTO (Importe base)
+*   - IV_TASA (Tasa de impuesto en porcentaje)
+* Parámetros de salida:
+*   - EV_IMPUESTO (Monto calculado del impuesto)
+*   - EV_TOTAL (Monto total incluyendo el impuesto)
+*-------------------------------------------------------------
+  IMPORTING
+    iv_monto TYPE p DECIMALS 2 " Monto base
+    iv_tasa  TYPE p DECIMALS 2 " Tasa de impuesto en porcentaje
+  EXPORTING
+    ev_impuesto TYPE p DECIMALS 2 " Impuesto calculado
+    ev_total    TYPE p DECIMALS 2 " Total incluyendo impuesto
+  EXCEPTIONS
+    invalid_input = 1. " Error en los parámetros de entrada
+
+  " Validar entradas
+  IF iv_monto < 0 OR iv_tasa < 0.
+    RAISE invalid_input.
+  ENDIF.
+
+  " Calcular impuesto
+  ev_impuesto = iv_monto * iv_tasa / 100.
+
+  " Calcular total incluyendo impuesto
+  ev_total = iv_monto + ev_impuesto.
+ENDFUNCTION.
