@@ -1,0 +1,29 @@
+REPORT z_programa_calculo_impuesto.
+
+PARAMETERS:
+  p_monto TYPE p DECIMALS 2 DEFAULT 100, " Monto base
+  p_tasa  TYPE p DECIMALS 2 DEFAULT 16. " Tasa de impuesto
+
+DATA:
+  lv_impuesto TYPE p DECIMALS 2, " Monto calculado del impuesto
+  lv_total    TYPE p DECIMALS 2. " Total incluyendo impuesto
+
+START-OF-SELECTION.
+  TRY.
+      " Llamar a la función para calcular el impuesto
+      CALL FUNCTION 'Z_CALCULAR_IMPUESTO'
+        EXPORTING
+          iv_monto = p_monto
+          iv_tasa  = p_tasa
+        IMPORTING
+          ev_impuesto = lv_impuesto
+          ev_total    = lv_total.
+    CATCH SYSTEM-EXCEPTIONS invalid_input = 1.
+      MESSAGE 'Error: Parámetros inválidos.' TYPE 'E'.
+  ENDTRY.
+
+  " Mostrar resultados
+  WRITE: / 'Monto Base:', p_monto,
+         / 'Tasa de Impuesto:', p_tasa,
+         / 'Impuesto Calculado:', lv_impuesto,
+         / 'Monto Total:', lv_total.
