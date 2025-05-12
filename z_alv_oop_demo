@@ -1,0 +1,37 @@
+REPORT z_alv_oop_demo.
+
+CLASS lcl_alv_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      display_alv.
+  PRIVATE SECTION.
+    DATA:
+      it_data TYPE TABLE OF sflight, " Tabla interna para almacenar datos
+      lo_alv  TYPE REF TO cl_salv_table. " Objeto ALV
+ENDCLASS.
+
+CLASS lcl_alv_demo IMPLEMENTATION.
+  METHOD display_alv.
+    " Obtener datos de la base de datos
+    SELECT * FROM sflight INTO TABLE it_data UP TO 100 ROWS.
+
+    " Crear el objeto ALV
+    TRY.
+        cl_salv_table=>factory(
+          IMPORTING
+            r_salv_table = lo_alv
+          CHANGING
+            t_table      = it_data ).
+      CATCH cx_salv_msg INTO DATA(lx_salv_error).
+        MESSAGE lx_salv_error->get_text( ) TYPE 'E'.
+    ENDTRY.
+
+    " Mostrar el ALV
+    lo_alv->display( ).
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+  " Crear instancia de la clase y ejecutar el método para mostrar el ALV
+  DATA(lo_alv_demo) = NEW lcl_alv_demo( ).
+  lo_alv_demo->display_alv( ).
