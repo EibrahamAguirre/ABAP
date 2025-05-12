@@ -1,0 +1,42 @@
+REPORT z_alv_jerarquico_demo.
+
+CLASS lcl_alv_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      display_alv.
+  PRIVATE SECTION.
+    DATA:
+      it_header TYPE TABLE OF zfactura,   " Tabla interna para cabecera (facturas)
+      it_item   TYPE TABLE OF zfactura_det, " Tabla interna para detalle (líneas de factura)
+      lo_alv    TYPE REF TO cl_salv_hierseq_table. " Objeto ALV jerárquico
+ENDCLASS.
+
+CLASS lcl_alv_demo IMPLEMENTATION.
+  METHOD display_alv.
+    " Obtener datos de la tabla de cabecera (facturas)
+    SELECT * FROM zfactura INTO TABLE it_header UP TO 50 ROWS.
+
+    " Obtener datos de la tabla de detalle (líneas de factura)
+    SELECT * FROM zfactura_det INTO TABLE it_item UP TO 500 ROWS.
+
+    " Crear el objeto ALV jerárquico
+    TRY.
+        cl_salv_hierseq_table=>factory(
+          IMPORTING
+            r_hierseq_table = lo_alv
+          CHANGING
+            t_header        = it_header
+            t_item          = it_item ).
+      CATCH cx_salv_msg INTO DATA(lx_salv_error).
+        MESSAGE lx_salv_error->get_text( ) TYPE 'E'.
+    ENDTRY.
+
+    " Mostrar el ALV
+    lo_alv->display( ).
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+  " Crear instancia de la clase y ejecutar el método para mostrar el ALV
+  DATA(lo_alv_demo) = NEW lcl_alv_demo( ).
+  lo_alv_demo->display_alv( ).
