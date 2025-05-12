@@ -1,2 +1,4 @@
-# ABAP
-Proyectos variados de ABAP
+# Portafolio de Proyectos
+Bienvenido a mi portafolio de desarrollo ABAP. Aquí encontrarás una selección de proyectos donde he aplicado mis conocimientos en SAP para resolver necesidades empresariales reales. Desde reportes ALV, formularios SmartForms y Adobe Forms, hasta módulos de funciones, BADIs, user-exits, y optimización de procesos con técnicas de performance tuning, cada proyecto refleja mi compromiso con la calidad, eficiencia y escalabilidad en entornos SAP ECC y S/4HANA.
+
+Mi enfoque está orientado a ofrecer soluciones técnicas limpias y sostenibles, alineadas con los requerimientos funcionales y los estándares de desarrollo de SAP. Además, me especializo en integraciones con otros sistemas, automatización de procesos masivos y manejo eficiente de datos maestros y transaccionales.
